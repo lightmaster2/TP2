@@ -162,16 +162,16 @@ fi
 ## 
 ##		Los tipos de comilla que pueden utiizarse son '', "", y ``. La diferencia estre ellos es:
 ##
-##			- '' representa al tipo de comilla "fuerte", debido a que lo que se escribe entre
-##				 ellas no sera inspeccionado y expandido por el shell, es decir, hacen que el texto
-##				 entre ellas permanezca estatico y literal.
+##		- '' representa al tipo de comilla "fuerte", debido a que lo que se escribe entre
+##			 ellas no sera inspeccionado y expandido por el shell, es decir, hacen que el texto
+##			 entre ellas permanezca estatico y literal.
 ##
-##			- "" representa al tipo de comillas "debil", debido a que permite que el shell inspeccione
-##				 el texto entre ellas y expanda las expresiones que reconozca como variables o caracteres
-##				 especiales reemplazandolos por sus valores. Es necesario el uso de caracteres de escape
-##				 para evitar el reemplazo de un valor especifico.
+##		- "" representa al tipo de comillas "debil", debido a que permite que el shell inspeccione
+##			 el texto entre ellas y expanda las expresiones que reconozca como variables o caracteres
+##			 especiales reemplazandolos por sus valores. Es necesario el uso de caracteres de escape
+##			 para evitar el reemplazo de un valor especifico.
 ##
-##			- `` representan el tipo de comillas de "ejecusion", debido a que el shell intentara interpretar
-##				 el texto entre ellas como una secuencia de comandos.  
+##		- `` representan el tipo de comillas de "ejecusion", debido a que el shell intentara interpretar
+##			 el texto entre ellas como una secuencia de comandos.  
 
 # EOF
