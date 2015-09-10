@@ -64,14 +64,14 @@ ErrorS() {
 }
 
 ErrorP() {
-	echo "Error. nombre_archivo no existe o no tiene permisos de lectura." # COMPLETADO
+	echo "Error. $1 no existe o no tiene permisos de lectura." # COMPLETADO
 }
 
 if test $# -lt 2; then
 	ErrorS
 fi
 if !(test -r $1); then
-	ErrorP
+	ErrorP $1
 elif test -f $1 && (test $2 = "L" || test $2 = "C" || test $2 = "M"); then
 	if test	$2 = "L"; then
 		res=`wc -l $1`
