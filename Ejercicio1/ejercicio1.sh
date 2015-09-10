@@ -104,8 +104,8 @@ elif test -f $1 && (test $2 = "L" || test $2 = "C" || test $2 = "M"); then
 		echo "Longitud de la linea mas larga del archivo: $res" # COMPLETADO
 	fi
 else
-	# Habiendo evitado procesar con datos erroneos, informamos el resultado de la operacion
-	# indicando su significado.
+	# Habiendo evitado procesar con datos erroneos, al usuario que cometio un error
+	# sintactico en la llamada al script.
 	ErrorS
 fi
 
