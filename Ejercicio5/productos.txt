@@ -1,0 +1,41 @@
+auto:fisher price:100
+araña:publister:60
+Avion:fly:767
+barco de madera:fisher price:200
+bicicleta spider:sr bicicletas:1000
+calesita:disney:500
+camion:fisher price:800
+camara de foto:nikon:500
+dragon:factory:100
+dados:casino:400
+dardos:apunte fijo:130
+elefante:plasticos ER:700
+equipo de nado:disney:400
+foca de goma:cartoon:130
+gattito de peluche:suavesito:400
+gñomo:cartoon:1130
+hadas de juego:diversion:400
+ingenio juegos:para pensar:120
+Indiana Jones:pelicula:340
+juedos de mesa:casino:240
+kiosco aprenda:maxi:989
+lapices de colores:pelikan:78
+llavero luminoso:trakis:70
+lampara de led:alumbre bien:899
+muñeco goku:akira:900
+muñeca barbie:lego:677
+nieve oso:peluche:998
+ñandu peluche:duerme bien:900
+oso polar:peluches:788
+oso tigre:peluches:332
+osito cariñoso:peluches:233
+pelota:adidas:877
+pedales bicicleta:frena bien:34
+ruedas bicicleta:bike:654
+sombrero: cartoon:44
+turboman:lego:667
+uva de plastico:decoracion:6
+vino artesanal:ruttini:1001
+wisky:8 hermanos:258
+xilofano:melodias:123
+zoo animals:fly:9
