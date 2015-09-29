@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #**************************************************************************************************
-# Nombre Del Script:		ejercicio1.sh
-# Trabajo Práctico Nro.:	1
-# Ejercicio Nro.:			1
+# Nombre Del Script:		ejercicio4.sh
+# Trabajo Práctico Nro.:	2
+# Ejercicio Nro.:			4
 # Entrega Nro:				ENTREGA
 # Integrantes:
 #
