@@ -163,7 +163,7 @@ function reporteMensual() {
 		exit
 	fi
 
-	cat $1 | awk -F "|" -v archivo=$1																																																																																																																																																																																																		'
+	cat $1 | awk -F "|" -v archivo=$1 '
 		BEGIN {
 			Meses["01"] = "Enero"
 			Meses["02"] = "Febrero"
@@ -174,7 +174,7 @@ function reporteMensual() {
 			Meses["07"] = "Julio"
 			Meses["08"] = "Agosto"
 			Meses["09"] = "Septiembre"
-			Meses["10"] = "Octubre"																																																																								
+			Meses["10"] = "Octubre"
 			Meses["11"] = "Noviembre"
 			Meses["12"] = "Diciembre"
 
