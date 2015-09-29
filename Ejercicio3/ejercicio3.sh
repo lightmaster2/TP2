@@ -1,24 +1,28 @@
 #! /bin/bash
-##############################################################################
-# Script: 	 	ejercicio3.sh
-# TP:     	 	2
-# Ejercicio: 	3
-# Integrantes:	
-#   
-#   
-#	
-#
-#
-# ENTREGA
-#############################################################################
+#***********************************************************************************************************************
+# Nombre Del Script:        ejercicio3.ps1
+# Trabajo Practico Nro.:    2
+# Ejercicio Nro.:           3
+# Entrega Nro.:             ENTREGA
+# Integrantes:              
+#	Apellidos                     Nombres                       DNI       
+#	----------------------------------------------------------------------
+#	Gomez Gonzalez                Lucas                         33.192.211
+#	Medrano                       Jonatan                       33.557.962
+#	Morganella                    Julian                        35.538.469
+#	Lucki                         Ariel Nicolas                 33.174.462
+#	Sendras                       Bruno Martin                  32.090.370
+#***********************************************************************************************************************
 
 
 #FUNCIONES
 AyudaScript(){
-    echo -e "\nVERSION:\t $BASH_VERSION\n" 
-    echo -e "USO: \t   $1 ruta_del_archivo/carpeta $2 ruta_archivo_log\n"
-    echo -e "OPCIONES:\t -?, -help, -h  Muestra la informacion de uso del script.\n"
-    echo -e "EJEMPLOS:\t   $0 /home/lgomez/Documentos/prueba1.sh $1 /home/lgomez/Documentos/logEjercicio3.log"
+    
+	clear    
+	echo -e "DESCRIPCION: El siguiente script busca en un directorio o archivo la existencia de scripts. Caso exisan, se pasa a mayusculas solo su nombre."
+    	echo -e "OPCIONES:-?, -help,-h Muestra la informacion de uso del script."
+    	echo -e "EJEMPLOS:\t   $0 /home/lgomez/Documentos/prueba1.sh $1 /home/lgomez/Documentos/logEjercicio3.log"
+	echo " "
 }
 
 errorParam1(){
@@ -47,23 +51,19 @@ then
 	exit 1
 fi
 
-#if [ ! -f $1 ]; then
- #   echo "El archivo/carpeta no existe."
- #   exit 1
-#fi
+#Valido si existe la carpeta o el archivo
+if [[ ! -f $1 && ! -d $1 ]]
+then
+	echo "El archivo/carpeta no existe."
+	exit 1
+fi
 
-# - Validacion de permisos de lectura sobre el archivo
-if [ ! -r $1 ]; then
+#Validacion de permisos de lectura sobre el archivo
+if [ ! -r $1 ]
+ then
     echo "El archivo no posee permisos de lectura."
     exit 1
 fi
-
-#4 - Chequear que el archivo sea de texto plano
-#tipoArchivo=$(file $1 | cut -d' ' -f2)
-#if [ $tipoArchivo != "ASCII" ]; the
- #   echo "El archivo indicado no se puede procesar, no es un archivo de texto."
-  #  exit 1
-#fi
 
 #Parametro2
 if [[ ! $2 ]]
@@ -72,15 +72,30 @@ then
 	exit 1
 fi
 
+#Valido si existe el archivo
+if [ ! -f $2 ]
+then
+	echo "El archivo de log no existe."
+	exit 1
+fi
+
+#Validacion de permisos de escritura sobre el archivo
+if [ ! -r $2 ]
+ then
+    echo "El archivo no posee permisos de escritura."
+    exit 1
+fi
+
 
 ##COMIENZA SCRIPT
 
-#Verifico que el directorio o archivo sean scripts
+#Verifico que el archivo sea un script o si el directorio contiene scripts
 ES_SCRIPT=$(grep -lir "#!" $1)
 
-
-OLDIFS=$IFS   # Valor original del IFS
-A=-1          # Indice
+# Valor original de la variable de entorno IFS
+OLDIFS=$IFS
+# Indice
+A=-1          
  
 IFS=$'\n'
 for LINEA in $ES_SCRIPT ; do
@@ -109,7 +124,8 @@ done
 DIA=`date +"%d/%m/%Y"`
 HORA=`date +"%H:%M"`
 
-IFS=$OLDIFS # Restablezco el IFS a su valor original
+# Restablezco el valor original del IFS
+IFS=$OLDIFS
  
 # Realizo las modificaciones a los archivos.
 if [ $A -ge 0 ] ; then
@@ -117,9 +133,9 @@ if [ $A -ge 0 ] ; then
 	#Se cambia el nombre del archivo, concatenando la ruta, el nombre y la extension en minusculas
 	mv ${RUTA[B]} ${RUTASINNOMBRE[B]}${NOMBRE[B]}${EXTENSION[B]} 2>> $2
 	
-	#NO ESTA REDIRECCIONANDO EL ERROR DE PERMISO DENEGADO - REVISAR
 	#Agrego dia y hora al final del archivo modificado
 	echo "$DIA $HORA" >> ${RUTASINNOMBRE[B]}${NOMBRE[B]}${EXTENSION[B]} 2>> $2
+	
 	#Logueo la modificacion y los errores.
 	echo "$DIA $HORA - Se modifico el archivo ${NOMBREEXTENSION[$B]}" >> $2 2>> $2
   done
