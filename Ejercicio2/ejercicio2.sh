@@ -49,12 +49,20 @@ fi
    echo "La Ruta del archivo indicado no existe o no es un archivo ordinario."
    exit 1
  fi
+ 
+ if [ ! -r $1 ]; then
+   echo "El Archivo indicado no posee permiso de lectura.."
+   exit 1
+ fi
 
 csentive=0  #si esta en 0 es case sensitive, distingue mayusculas y minusculas.
 
 if [[ $2 == "-c" || $2 == "-C" ]]
  then
 	csentive=1
+elif [[ $2 != "" ]];then
+echo "El segundo parametro ingreado no es valido."
+exit 1
 fi
 
 
