@@ -1,0 +1,66 @@
+#!/bin/bash
+# Configuración de señales.
+trap "comando" SIGUSR1
+trap "finalizar=1" SIGTERM
+
+# Creamos algunas variables globales para el demonio.
+dirIn=
+dirOut=
+intervalo=
+timeStamp=
+nombreDir=
+nombreZip=
+dirIntercambio=
+
+# Función para obtener un nombre relativamente único (por timestamp).
+function configurarNombre() {
+	timeStamp=$(date +"%d_%m_%Y_%H_%M_%S")
+	nombreDir=$(basename $dirIn)
+	nombreZip=$$"_"$nombreDir"_"$timeStamp
+}
+
+# Función para realizar el backup.
+function comando() {
+	# Nos cambiamos al directorio raíz.
+	cd /
+
+	# Creamos un directorio temporal para realizar el backup.
+	tmpDir=$(mktemp -d --tmpdir="$dirIntercambio")
+
+	# Armamos el nombre del archivo de backup.
+	configurarNombre
+
+	# Realizamos el backup.
+	rsync -a "$dirIn" "$tmpDir"
+
+	# Nos posicionamos en el directorio de backup.
+	cd "$tmpDir"
+
+	# Comprimimos el backup y lo ponemos en el directorio de salida.
+	tar -zcf "$dirOut/$nombreZip.tar.gz" *
+
+	# Nos posicionamos nuevamente en el directorio raíz.
+	cd /
+
+	# Borramos los archivos temporales creados.
+	rm -rf "$tmpDir"
+}
+
+# Inicializamos las variables globales que son fijas.
+dirIn="$1"
+dirOut="$2"
+intervalo="$3"
+dirIntercambio="$4"
+finalizar=0
+
+# Loop infinito del demonio.
+while :
+do
+	if [[ $finalizar == 1 ]]; then
+		break
+	fi
+	comando
+	sleep "$intervalo" & wait
+done
+
+rm -rf "$dirIntercambio"
