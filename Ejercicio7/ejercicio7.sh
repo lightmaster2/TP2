@@ -309,7 +309,7 @@ function doPlay() {
 ### SCRIPT
 
 # Verificamos si el usuario solicitó ayuda.
-if [[ "$1" == "-?" ]]; then
+if [[ "$1" == "-h" || "$1" == "-?" || "$1" == "-help" ]]; then
 	# Mostramos la ayuda y salimos.
 	ayuda
 	exit 0
