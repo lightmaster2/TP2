@@ -63,8 +63,11 @@ ayuda() {
 	echot 1 "play: crear un resguardo en el momento."
 	echo
 	echo "Ejemplos:"
-	echo "$0 start . ./out 120"
+	echot 1 "Iniciar el backup del dir1 al dir2 cada 2 minutos"
+	echo "$0 start /dir1 /dir2 120"
+	echot 1 "Contar la cantidad de backups disponibles"
 	echo "$0 count "
+	echot 1 "Borrar todos los backups salvo los 5 más recientes"
 	echo "$0 clear 5"
 }
 
