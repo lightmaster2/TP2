@@ -1,19 +1,18 @@
 #! /bin/bash
-#**************************************************************************************************
-# Nombre Del Script:		ejercicio2.sh
-# Trabajo Práctico Nro.:	2
-# Ejercicio Nro.:			2
-# Entrega Nro:				REENTREGA
-# Integrantes:
-#
-#	APELLIDOS		NOMBRES			DNI
-#   ------------------------------------------
-#	@integrante1
-#	@integrante2
-#	@integrante3
-#	@integrante4
-#
-#**************************************************************************************************
+#***********************************************************************************************************************
+# Nombre Del Script:        ejercicio2.ps1
+# Trabajo Practico Nro.:    2
+# Ejercicio Nro.:           2
+# Entrega Nro.:             REENTREGA
+# Integrantes:              
+#	Apellidos                     Nombres                       DNI       
+#	----------------------------------------------------------------------
+#	Gomez Gonzalez                Lucas                         33.192.211
+#	Medrano                       Jonatan                       33.557.962
+#	Morganella                    Julian                        35.538.469
+#	Lucki                         Ariel Nicolas                 33.174.462
+#	Sendras                       Bruno Martin                  32.090.370
+#***********************************************************************************************************************
 
 declare -A palabra #declaro un array asociativo
 declare -A ordenado #declaro un vector
