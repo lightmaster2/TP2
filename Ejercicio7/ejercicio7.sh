@@ -155,11 +155,18 @@ function validarDirectorioEscritura() {
 # Validar llamada sin parámetros
 function validarLlamada() {
 	# Verificamos que el proceso esté corriendo.
-	if [[ !(-r $archivoPID) ]]; then
-		# ¿No existe el proceso?
-		if [[ !(-e $archivoPID) ]]; then
-			# No existe, mostramos el error y abortamos.
-			error "El demonio no se encuentra corriendo. Vea la ayuda con -?"
+	if [[ !(-r "$archivoPID") ]]; then
+		# ¿No existe el archivo de estado del proceso demonio?
+		if [[ !(-e "$archivoPID") ]]; then
+			# ¿No existe porque alguien lo borró?
+			demonioCorriendo=$(ps -x -ww | grep "[d]emonio.sh")
+			if [[ !(-z "$demonioCorriendo") ]]; then
+				# El demonio está corriendo, pero el archivo fue borrado. Lo creamos nuevamente.
+				mkdir -p "$directorioIntercambio" 2>&1
+				$(echo $demonioCorriendo | awk '{ printf "PID=%s\nDIR_IN=%s\nDIR_OUT=%s\nINT=%s\nDIR_EXC=%s", $1, $7, $8, $9, $10; }' > "$archivoPID")
+			else
+				error "El demonio no se encuentra corriendo. Vea la ayuda con -?"
+			fi
 		else
 			# No tenemos permisos de lectura, mostramos el error y abortamos.
 			error "No tiene acceso al demonio."
@@ -167,7 +174,8 @@ function validarLlamada() {
 	fi
 
 	# Leemos la información del demonio.
-	source $archivoPID
+	source "$archivoPID"
+
 }
 
 # Inicia la ejecución del demonio, debe solicitar por parámetro el directorio a salvar, el directorio donde guardar el
@@ -175,8 +183,8 @@ function validarLlamada() {
 # .\ejercicio7.sh start <dirIn> <dirOut> <intervalo>
 function doStart() {
 	# Verificamos que el proceso no esté corriendo.
-	if [[ -r $archivoPID ]]; then
-		source $archivoPID
+	if [[ -r "$archivoPID" ]]; then
+		source "$archivoPID"
 		if [[ -e /proc/"$PID"/exe ]]; then
 			# Si existe el archivo de intercambio, verificamos que el proceso esté corriendo realmente.
 			error "El proceso ya se encuentra corriendo bajo el PID $PID"
@@ -185,8 +193,18 @@ function doStart() {
 			echo "Parece que la ejecución anterior falló en finalizar, relanzando demonio"
 			rm $archivoPID
 		fi
-	elif [[ !(-r $archivoPID) && (-e $archivoPID) ]]; then
+	elif [[ !(-r "$archivoPID") && (-e "$archivoPID") ]]; then
 		error "El proceso ya fue iniciado en su nombre, ver $archivoPID"
+	elif [[ !(-r "$archivoPID") && !(-e "$archivoPID") ]]; then
+		# ¿No existe porque alguien lo borró?
+		demonioCorriendo=$(ps -x -ww | grep "[d]emonio.sh")
+		if [[ $? -eq 0 || !(-z "$demonioCorriendo") ]]; then
+			# El demonio está corriendo, pero el archivo fue borrado. Lo creamos nuevamente.
+			mkdir -p "$directorioIntercambio" 2>&1
+			$(echo $demonioCorriendo | awk '{ printf "PID=%s\nDIR_IN=%s\nDIR_OUT=%s\nINT=%s\nDIR_EXC=%s", $1, $7, $8, $9, $10; }' > "$archivoPID")
+			source "$archivoPID"
+			error "El proceso ya se encuentra corriendo bajo el PID $PID"
+		fi
 	fi
 
 	# Verificamos la cantidad de parámetros.
@@ -223,7 +241,7 @@ function doStart() {
 	echo "DIR_EXC=$DIR_EXC" >> "$archivoPID"
 
 	# Cargamos el archivo en memoria como configuración del script.
-	source $archivoPID
+	source "$archivoPID"
 
 	# Mostramos el PID del demonio.
 	echo "Lanzado demonio bajo el PID $PID"
@@ -240,6 +258,7 @@ function doStop() {
 	fi
 
 	# Enviamos la señal al demonio.
+	echo $PID
 	kill -SIGTERM "$PID"
 }
 
