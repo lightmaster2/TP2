@@ -128,8 +128,7 @@ function ficharSalida() {
 	# Reemplazamos el registro parcial por el nuevo.
 	sed -i "s#$registro#$registroDiario#g" $1
 
-	diferenciaSegundos=$((`date -u -d $diferenciaHoraria +%s`))
-	# Ahora actualizamos el registro mensual, representado por la ultima linea.
+	# diferenciaSegundos=$((`date -u -d $diferenciaHoraria +%s`))
 	
 	# Leemos el ultimo registro y lo parseamos.
 	registroMensual=`sed -n '$p' $1`
@@ -139,17 +138,53 @@ function ficharSalida() {
 	diasTrabajados=$(($diasTrabajadosAcumulados+1))
 	
 	# calculamos las horas que deberiamos haber trabajado.
-	horasTeoricas=$((diasTrabajados*8))
+	horasTeoricas=$(($diasTrabajados*8))
 
 	#Tomamos el acumulado de horas que llevamos y le sumamos las horas trabajadas hoy.
 	horasRealesAcumuladas=`echo $registroMensual | cut -d '|' -f 2`
-	horasRealesAcumuladasSegundos=`date -d $horasRealesAcumuladas +%s`
+
+	Hor=$( expr `echo $horasRealesAcumuladas | cut -d ':' -f 1` + 0)
+	Min=$( expr `echo $horasRealesAcumuladas | cut -d ':' -f 2` + 0)
+	Sec=$( expr `echo $horasRealesAcumuladas | cut -d ':' -f 3` + 0)
+
+	horasRealesAcumuladasSegundos=$((($Hor*3600)+($Min*60)+($Sec)))
 	horasRealesSegundos=$((horasRealesAcumuladasSegundos + $diferenciaSegundos))
+	saldoDeHorasSegundos=$((($horasTeoricas*3600) - $horasRealesSegundos))
 
-	# Calculamos el saldo actual de horas.
-	saldoDeHoras=$((($horasTeoricas*3600) - $horasRealesSegundos))
+	# FORMATEO HORAS ACUMULADAS
+	# Obtengo las horas y el resto en segundos.
+	Hor=$( expr $horasRealesSegundos / 3600)
+	resto=$( expr $horasRealesSegundos % 3600)
 
-	nuevoRegistroMensual=$diasTrabajados\|`date -d @$horasRealesSegundos +%H:%M:%S`\|$saldoDeHoras
+	# Con el resto en segundos obtengo los minutos.
+	Min=$( expr $resto / 60)
+
+	# El resto de la division anterior representa los segundos.
+	Sec=$( expr $resto % 60)
+
+	HorasAcumuladas=`printf "%02d:%02d:%02d" $Hor $Min $Sec`
+
+	# FORMATEO LA DIFERENCIA (SALDO DE HORAS)
+	signo=""
+	if [ $saldoDeHorasSegundos -lt 0 ]; then
+		signo="-"
+		saldoDeHorasSegundos=$( expr 0 - $saldoDeHorasSegundos)
+	fi
+
+	# Obtengo las horas y el resto en segundos.
+	Hor=$( expr $saldoDeHorasSegundos / 3600)
+	resto=$( expr $saldoDeHorasSegundos % 3600)
+
+	# Con el resto en segundos obtengo los minutos.
+	Min=$( expr $resto / 60)
+
+	# El resto de la division anterior representa los segundos.
+	Sec=$( expr $resto % 60)
+
+	saldoDeHoras=`printf "%02d:%02d:%02d" $Hor $Min $Sec`
+
+	# Ahora actualizamos el registro mensual, representado por la ultima linea.
+	nuevoRegistroMensual=$diasTrabajados\|$HorasAcumuladas\|$signo$saldoDeHoras
 	
 	# Actualizamos el registro.
 	sed -i "s#$registroMensual#$nuevoRegistroMensual#g" $1
