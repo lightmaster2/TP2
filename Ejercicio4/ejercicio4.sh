@@ -35,7 +35,7 @@ ayuda() {
 	echo "	$0 -i"
 	echo "	$0 -f"
 	echo "	$0 -r 09"
-	echo "	$0 -f 2015"
+	echo "	$0 -y 2015"
 }
 
 function errorEnLlamada () {
@@ -104,18 +104,19 @@ function ficharSalida() {
 	registro=`grep -m 1 $fecha $1`
 	if [[ $registro == "" ]]; then
 		echo "No se puede proceder, debe registrar el ingreso previamente."
+		exit
 	fi
 
 	# Ya fichamos la salida?
 	error=${registro:19:1}
-	echo $error
+	# echo $error
 	if [[ $error == "|" ]]; then
 		echo "No se puede proceder, ya se ha registrado la salida para el dia de hoy."
 		exit
 	fi
 	# Obtenemos la hora de ingreso.
 	horaIngreso=`echo $registro | cut -d '|' -f 2`
-	
+
 	# Calculamos la diferencia en segundos.
 	diferenciaSegundos=$(($(date -d $horaSalida +%s) - $(date -d $horaIngreso +%s)))
 
@@ -152,6 +153,9 @@ function ficharSalida() {
 	
 	# Actualizamos el registro.
 	sed -i "s#$registroMensual#$nuevoRegistroMensual#g" $1
+
+	# Avisamos al usuario que todo salio bien.
+	echo "Salida registrada con exito."
 }
 
 function reporteMensual() {
@@ -226,6 +230,11 @@ case $OPT in
 	y)
 		# Mostramos el reporte anual.
 		anio=$2
+		encontrados=`ls | grep -e $anio | wc -l`
+		if [[ $encontrados == "0" ]]; then
+			echo "No hay registros para el año $anio"
+			exit
+		fi
 		archivos=`ls | grep -e $anio`
 		for archivo in $archivos; do
 
