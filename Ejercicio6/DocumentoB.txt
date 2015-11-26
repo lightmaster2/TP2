@@ -1,0 +1,6 @@
+P AR Argentina
+C RS Rosario
+P UR Uruguay
+P BR Brasil
+P EE Estados Unidos
+C BG Bogotá
