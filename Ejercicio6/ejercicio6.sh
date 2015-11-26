@@ -194,15 +194,21 @@ patronAWK='(NF >= 3) &&
 
 # Creamos un archivo temporal para guardar las cadenas de reemplazo para sed.
 patronesSed=$(mktemp)
+archivoTemporal=$(mktemp)
+archivoTempo=$(mktemp)
 
 # Ejecutamos AWK para obtener las cadenas de reemplazo para sed.
 awk -F" " "$patronAWK" "$archivoCodigos" > "$patronesSed" #hola
 
+
 # Creamos otro patron de AWK para quedarnos sólo con las líneas "válidas" del archivo de persona.
 patronAWK='NF == 3 { print $0 }'
 
+# Ejecutamos AWK sobre el archivo de personas y lo guardamos temporalmente.
+awk -F", " "$patronAWK" "$archivoPersonas" > "$archivoTemporal"
+
 # Creamos un archivo temporal para guardar los resultados intermedios.
-archivoTemporal=$(mktemp)
+
 
 # Ejecutamos sed para que realice los reemplazos en el lugar.
 sed -i'' -f "$patronesSed" "$archivoTemporal"
@@ -216,10 +222,10 @@ patronAWK='{
 archivoTemp=$(mktemp)
 
 # Ejecutamos AWK con dicho patrón y guardamos temporalmente la salida.
-awk -F", " "$patronAWK" "$archivoPersonas" > $archivoTemporal
+awk -F", " "$patronAWK" "$archivoTemporal" > $archivoTempo
 
 # Tomamos dicha la salida y la ordenamos por país y nombre.
-cat "$archivoTemporal" | sort -u -d -k1 -k2 > $archivoTemp
+cat "$archivoTempo" | sort -u -d -k1 -k2 > $archivoTemp
 
 # Creamos un último patrón para AWK que modifique la salida del archivo de modo que:
 #     1. Si ya está escrito el país, que imprima el nombre de la persona.
@@ -240,4 +246,6 @@ awk -F"," "$patronAWK" $archivoTemp > "$archivoSalida"
 rm "$patronesSed"
 rm "$archivoTemporal"
 rm "$archivoTemp"
+rm "$archivoTempo"
+
 # EOF
