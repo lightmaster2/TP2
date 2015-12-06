@@ -1,29 +1,27 @@
 #!/bin/bash
-
-#**************************************************************************************************
-# Nombre Del Script:		ejercicio4.sh
-# Trabajo Práctico Nro.:	2
-# Ejercicio Nro.:			4
-# Entrega Nro:				ENTREGA
-# Integrantes:
-#
-#	APELLIDOS		NOMBRES			DNI
-#   ------------------------------------------
-#	@integrante1
-#	@integrante2
-#	@integrante3
-#	@integrante4
-#
-#**************************************************************************************************
+#***********************************************************************************************************************
+# Nombre Del Script:        ejercicio4.sh
+# Trabajo Practico Nro.:    2
+# Ejercicio Nro.:           4
+# Entrega Nro.:             REENTREGA
+# Integrantes:              
+#	Apellidos                     Nombres                       DNI       
+#	----------------------------------------------------------------------
+#	Gomez Gonzalez                Lucas                         33.192.211
+#	Medrano                       Jonatan                       33.557.962
+#	Morganella                    Julian                        35.538.469
+#	Lucki                         Ariel Nicolas                 33.174.462
+#	Sendras                       Bruno Martin                  32.090.370
+#***********************************************************************************************************************
 
 ayuda() {
 	echo "Este script permite fichar los horarios de entrada y"
 	echo "salida de un empleado. Ademas permite la consulta de"
-	echo "los registros genreados."
+	echo "los registros generados."
 	echo
 	echo "	Uso: $0 <opción> [<arg>]"
 	echo "	Donde <opción> especifica la funcion deseada y <arg>"
-	echo "	es un numero entero."
+	echo "	es una fecha (opcionalmente con la hora, por defecto 00:00:00)."
 	echo
 	echo "Opciones:"
 	echo "	-i: Ficha el ingreso con la hora y fecha actuales."
@@ -49,10 +47,10 @@ function validarArchivoDeRegistro() {
 	# Existe el archivo?
 	if !(test -f $1); then
 		if [[ $2 == "crear" ]]; then
-			# No, lo creamos. 
+			# No, lo creamos.
 			echo "0|00:00:00|0" > $1
-		else	
-			echo "El archivo de registro mensual $1 no existe."		
+		else
+			echo "El archivo de registro mensual $1 no existe."
 			exit
 		fi
 	fi
@@ -69,21 +67,26 @@ function validarArchivoDeRegistro() {
 }
 
 function ficharIngreso() {
-	
+
 	# Existe el archivo de registro mensual?
 	validarArchivoDeRegistro $1 "crear"
-	
-	# Obtenemos fecha y hora actuales.
-	fecha=`date +%d/%m/%Y`
-	horaIngreso=`date +%H:%M:%S`	
-	
+
+	# Separamos fecha y hora actuales.
+	fecha=`date --date="$2" +%d/%m/%Y`
+	horaIngreso=
+	if [[ $# -eq 2 ]]; then
+		horaIngreso=`date --date="$2" +%H:%M:%S`
+	else
+		horaIngreso=`date --date="$2 $3" +%H:%M:%S`
+	fi
+
 	# Verificamos si ya se ficho el ingreso.
-	registro=`grep -c -m 1 $fecha $1`
-	if test $(($registro)) -ne 0; then
-		echo "No se puede proceder, ya se ha registrado el ingreso para el dia de hoy."
+	registro=$(grep -c -m 1 $fecha $1)
+	if [[ $registro -ne 0 ]]; then
+		echo "No se puede proceder, ya se ha registrado el ingreso para el dia indicado."
 		exit
-	fi	
-	
+	fi
+
 	# Registramos fecha y hora. Insertamos siempre antes de la ultima linea.
 	sed -i "$ i\\$fecha\|$horaIngreso" $1
 
@@ -96,9 +99,14 @@ function ficharSalida() {
 	# Existe el archivo de registro mensual?
 	validarArchivoDeRegistro $1
 
-	# Obtenemos fecha y hora actuales.
-	fecha=`date +%d/%m/%Y`
-	horaSalida=`date +%H:%M:%S`
+	# Separamos fecha y hora actuales.
+	fecha=`date --date="$2" +%d/%m/%Y`
+	horaSalida=
+	if [[ $# -eq 2 ]]; then
+		horaSalida=`date --date="$2" +%H:%M:%S`
+	else
+		horaSalida=`date --date="$2 $3" +%H:%M:%S`
+	fi
 
 	# Verificamos que se haya registrado el ingreso previamente.
 	registro=`grep -m 1 $fecha $1`
@@ -111,7 +119,7 @@ function ficharSalida() {
 	error=${registro:19:1}
 	# echo $error
 	if [[ $error == "|" ]]; then
-		echo "No se puede proceder, ya se ha registrado la salida para el dia de hoy."
+		echo "No se puede proceder, ya se ha registrado la salida para el dia indicado."
 		exit
 	fi
 	# Obtenemos la hora de ingreso.
@@ -129,14 +137,14 @@ function ficharSalida() {
 	sed -i "s#$registro#$registroDiario#g" $1
 
 	# diferenciaSegundos=$((`date -u -d $diferenciaHoraria +%s`))
-	
+
 	# Leemos el ultimo registro y lo parseamos.
 	registroMensual=`sed -n '$p' $1`
 
 	# Tomamos el acumulado de dias y le sumamos el dia actual.
 	diasTrabajadosAcumulados=$((`echo $registroMensual | cut -d '|' -f 1`))
 	diasTrabajados=$(($diasTrabajadosAcumulados+1))
-	
+
 	# calculamos las horas que deberiamos haber trabajado.
 	horasTeoricas=$(($diasTrabajados*8))
 
@@ -165,10 +173,12 @@ function ficharSalida() {
 	HorasAcumuladas=`printf "%02d:%02d:%02d" $Hor $Min $Sec`
 
 	# FORMATEO LA DIFERENCIA (SALDO DE HORAS)
+	# Si el saldo es negativo, se trabajó demás; si el saldo es positivo faltan horas.
 	signo=""
 	if [ $saldoDeHorasSegundos -lt 0 ]; then
-		signo="-"
 		saldoDeHorasSegundos=$( expr 0 - $saldoDeHorasSegundos)
+	elif [ $saldoDeHorasSegundos -gt 0 ]; then
+		signo="-"
 	fi
 
 	# Obtengo las horas y el resto en segundos.
@@ -185,7 +195,7 @@ function ficharSalida() {
 
 	# Ahora actualizamos el registro mensual, representado por la ultima linea.
 	nuevoRegistroMensual=$diasTrabajados\|$HorasAcumuladas\|$signo$saldoDeHoras
-	
+
 	# Actualizamos el registro.
 	sed -i "s#$registroMensual#$nuevoRegistroMensual#g" $1
 
@@ -233,11 +243,8 @@ function reporteMensual() {
 	'
 }
 
-# Obtenemos el nombre del archivo de registro.
-archivoDeRegistroMensual=`date +%Y.%m.ch`
-
 # Obtenemos las opciones ingresadas.
-getopts "ifr:y:h" OPT 2>/dev/null
+getopts "i:f:r:y:h" OPT 2>/dev/null
 
 # Significa que esperamos lo siguiente:
 # -i sin argumentos
@@ -249,11 +256,59 @@ getopts "ifr:y:h" OPT 2>/dev/null
 case $OPT in
 	i)
 		# Fichamos el inicio de la jornada laboral.
-		ficharIngreso $archivoDeRegistroMensual
+		fecha=
+		horaActual=`date "+%H:%M:%S" 2>&1`
+		if [[ $# -eq 2 ]]; then # Si vino solamente la fecha.
+			shift
+			fechaParam=`echo "$*" | awk '{print substr($0,7,4)"-"substr($0,4,2)"-"substr($0,1,2)}' 2>&1`
+			fechaIn=`date --date="$fechaParam $horaActual" "+%Y-%m-%d %H:%M:%S" 2>&1`
+			if [[ $? -eq 0 ]]; then
+				fecha="$fechaIn"
+			fi
+		elif [[ $# -eq 3 ]]; then  # Si vino la fecha y la hora.
+			shift
+			fechaParam=`echo "$*" | awk '{print substr($0,7,4)"-"substr($0,4,2)"-"substr($0,1,2)""substr($0,11)}' 2>&1`
+			fechaIn=`date --date="$fechaParam" "+%Y-%m-%d %H:%M:%S" 2>&1`
+			if [[ $? -eq 0 ]]; then
+				fecha="$fechaIn"
+			fi
+		else
+			echo "Debe indicar una fecha"
+			exit
+		fi
+
+		# Creamos el nombre del archivo de registro.
+		archivoDeRegistroMensual=`date --date="$fecha" +%Y.%m.ch`
+
+		ficharIngreso $archivoDeRegistroMensual $fecha
 		;;
 	f)
 		# Fichamos el final de la jornada.
-		ficharSalida $archivoDeRegistroMensual
+		fecha=
+		horaActual=`date "+%H:%M:%S" 2>&1`
+		if [[ $# -eq 2 ]]; then # Si vino solamente la fecha.
+			shift
+			fechaParam=`echo "$*" | awk '{print substr($0,7,4)"-"substr($0,4,2)"-"substr($0,1,2)}' 2>&1`
+			fechaIn=`date --date="$fechaParam $horaActual" "+%Y-%m-%d %H:%M:%S" 2>&1`
+			if [[ $? -eq 0 ]]; then
+				fecha="$fechaIn"
+			fi
+		elif [[ $# -eq 3 ]]; then  # Si vino la fecha y la hora.
+			shift
+			fechaParam=`echo "$*" | awk '{print substr($0,7,4)"-"substr($0,4,2)"-"substr($0,1,2)""substr($0,11)}' 2>&1`
+			fechaIn=`date --date="$fechaParam" "+%Y-%m-%d %H:%M:%S" 2>&1`
+			if [[ $? -eq 0 ]]; then
+				fecha="$fechaIn"
+			fi
+		else
+			echo "Debe indicar una fecha"
+			exit
+		fi
+
+		# Creamos el nombre del archivo de registro.
+		archivoDeRegistroMensual=`date --date="$fecha" +%Y.%m.ch`
+
+		ficharSalida $archivoDeRegistroMensual $fecha
 		;;
 	r)
 		# Mostramos el reporte mensual.
